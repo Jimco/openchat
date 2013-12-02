@@ -26,10 +26,11 @@
   <script src='http://localhost:2222/socket.io/socket.io.js'></script>
   <script>
     var chat = {};
+
     chat.socketio = {  
       chatSocket: null,  
 
-      initialize: function () {  
+      init: function () {  
 
         chat.socketio.chatSocket = io.connect('http://localhost:2222');
 
@@ -37,40 +38,38 @@
           chat.socketio.log('进入聊天室。');  
         });
 
-        chat.socketio.chatSocket.on('YourMessageResponse', function(data){
-          chat.socketio.log('Server Custom Response: ' + data + '<br />');  
+        chat.socketio.chatSocket.on('chatResponse', function(data){
+          chat.socketio.log('Broadcast: ' + data + '<br />');  
         });
 
         chat.socketio.chatSocket.on('disconnect', function(){  
-          chat.socketio.log('You are disconnected from Server<br />');  
+          chat.socketio.log('与服务器连接断开，检查网络是否正常~');
         });
 
         $('.submit').on('click', function(e){
           var $txtwrap = $('textarea')
             , value = $txtwrap.val();
 
-          chat.socketio.emitCustomMessageToServer(value);
+          chat.socketio.emitToServer(value);
           $txtwrap.val('');
         });
-
-        // document.querySelector('#sendCustMes').onclick = function () {  
-        //   chat.socketio.emitCustomMessageToServer(document.querySelector('#custMes').value);  
-        //   document.querySelector('#custMes').value = '';  
-        // };
-      },            
-
-      emitCustomMessageToServer: function(data){  
-        chat.socketio.chatSocket.emit('YourcustomMessage', data);  
-        chat.socketio.log('Custom message to Server: ' + data + '<br />');  
       },
 
-      log: function(message){  
-        // document.querySelector('#log').innerHTML += message;
+      emitToServer: function(data){  
+        chat.socketio.chatSocket.emit('chatMessage', data);
+        chat.socketio.log('me: ' + data + '<br />');  
+      },
+
+      log: function(message){
         $('.message').append('<div class="msg info">'+ message +'</div>')
       }
-    }
+    };
 
-    chat.socketio.initialize();  
+    $('.empty').on('click', function(e){
+      $('.message').html('');
+    });
+
+    chat.socketio.init();
   </script> 
 </body> 
 </html> 
