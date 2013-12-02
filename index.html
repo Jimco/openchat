@@ -3,51 +3,74 @@
 <head> 
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Nodejs + WebSocket 打造实时聊天室</title>
+  <link rel="stylesheet" href="css/style.css">
 </head> 
-<body>    
-  <div id='log'></div> 
-  <input type='text' id='custMes' /> 
-  <button type='button' id='sendCustMes'>Brodcast</button> 
+<body>
+  <div class="content">
+    <div class="message"></div>
+    <div class="tool">
+      <span class="empty">清空记录</span>
+    </div>
+    <div class="send">
+      <textarea class="chat" name="chat"></textarea>
+      <p><input type="submit" class="submit" name="submit" value="发送" /></p>
+    </div>
+    <div class="list">
+      <h3>在线用户<strong class="online">0</strong></h3>
+      <ul>
+      </ul>
+    </div>
+  </div>
  
- <script src='http://localhost:2222/socket.io/socket.io.js'></script>
+  <script src="js/jquery-1.8.3.min.js"></script>
+  <script src='http://localhost:2222/socket.io/socket.io.js'></script>
   <script>
-    var HTML5WebSockets = {};  
-    HTML5WebSockets.socketio = {  
-      yoursocket: null,  
+    var chat = {};
+    chat.socketio = {  
+      chatSocket: null,  
 
       initialize: function () {  
 
-        HTML5WebSockets.socketio.yoursocket = io.connect('http://localhost:2222');  
+        chat.socketio.chatSocket = io.connect('http://localhost:2222');
 
-        HTML5WebSockets.socketio.yoursocket.on('connect', function () {  
-          HTML5WebSockets.socketio.log('You are connected to Server<br />');  
+        chat.socketio.chatSocket.on('connect', function(){
+          chat.socketio.log('进入聊天室。');  
         });
 
-        HTML5WebSockets.socketio.yoursocket.on('YourMessageResponse', function (data) {  
-          HTML5WebSockets.socketio.log('Server Custom Response: ' + data + '<br />');  
+        chat.socketio.chatSocket.on('YourMessageResponse', function(data){
+          chat.socketio.log('Server Custom Response: ' + data + '<br />');  
         });
 
-        HTML5WebSockets.socketio.yoursocket.on('disconnect', function () {  
-          HTML5WebSockets.socketio.log('You are disconnected from Server<br />');  
+        chat.socketio.chatSocket.on('disconnect', function(){  
+          chat.socketio.log('You are disconnected from Server<br />');  
         });
 
-        document.querySelector('#sendCustMes').onclick = function () {  
-          HTML5WebSockets.socketio.emitCustomMessageToServer(document.querySelector('#custMes').value);  
-          document.querySelector('#custMes').value = '';  
-        };
+        $('.submit').on('click', function(e){
+          var $txtwrap = $('textarea')
+            , value = $txtwrap.val();
+
+          chat.socketio.emitCustomMessageToServer(value);
+          $txtwrap.val('');
+        });
+
+        // document.querySelector('#sendCustMes').onclick = function () {  
+        //   chat.socketio.emitCustomMessageToServer(document.querySelector('#custMes').value);  
+        //   document.querySelector('#custMes').value = '';  
+        // };
       },            
 
-      emitCustomMessageToServer: function (data) {  
-        HTML5WebSockets.socketio.yoursocket.emit('YourcustomMessage', data);  
-        HTML5WebSockets.socketio.log('Custom message to Server: ' + data + '<br />');  
+      emitCustomMessageToServer: function(data){  
+        chat.socketio.chatSocket.emit('YourcustomMessage', data);  
+        chat.socketio.log('Custom message to Server: ' + data + '<br />');  
       },
 
-      log: function (message) {  
-        document.querySelector('#log').innerHTML += message;  
+      log: function(message){  
+        // document.querySelector('#log').innerHTML += message;
+        $('.message').append('<div class="msg info">'+ message +'</div>')
       }
     }
 
-    HTML5WebSockets.socketio.initialize();  
+    chat.socketio.initialize();  
   </script> 
 </body> 
 </html> 
