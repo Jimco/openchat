@@ -2,6 +2,7 @@
 /* Reset */
 body,h1,h2,h3,h4,h5,h6,blockquote,p,pre,dl,dd,ol,ul,caption,th,td,form,fieldset,legend,input,button,textarea,address{margin:0;padding:0}
 body,button,input,select,textarea{font: 12px/1.5 \5FAE\8F6F\96C5\9ED1,\5b8b\4f53,Arial,tahoma,Srial,helvetica,sans-serif;color:#000;}
+button,input,select,textarea{outline:none;}
 h1,h2,h3,h4,h5,h6{font-size:100%;}
 em{font-style:normal;}
 ul,ol,li,dl,dt,dd{list-style:none;}
@@ -20,20 +21,22 @@ body{background:#fff;}
 /* Main */
 .submit{cursor:pointer;}
 .content{margin:50px auto;width:700px;border:1px solid #BFBFBF;background:#FFF;}
-.message{border-bottom: 1px solid #BFBFBF;padding:10px;height: 400px;overflow: auto;line-height:1.8;}
+.message{border-bottom:1px solid #BFBFBF;padding:10px;height: 400px;overflow:auto;line-height:1.8;}
 .message .msg{color:#FF0000;}
-.message .chat{color:#333;}
-.message .chat .name{font-size:12px;color:#12c;font-weight:bold;}
-.message .chat.admin_chat .name{color:#FF0000;}
-.message .chat p{margin:0 0 10px 0;}
+.message .chatinfo{color:#333;}
+.message .chatinfo .name{font-size:12px;color:#12c;font-weight:bold;}
+.message .chatinfo.admin_chat .name{color:#FF0000;}
+.message .chatinfo p{margin:0 0 10px 0;}
 .tool{padding:8px 10px;border-bottom:1px solid #BFBFBF;}
 .tool span{display: inline-block;margin-right: 14px;cursor:pointer;}
-.send {float:left;}
-.send .chat{display:block;width:440px;height:140px;margin:10px;padding:5px;border:1px solid #bfbfbf;resize:vertical;outline:none;}
+.send{float:left;}
+.send .userinfo{margin:10px;}
+.send .nickinput{width:200px;height:15px;padding:5px;border:1px solid #bfbfbf;}
+.send .chatBox{display:block;width:440px;height:140px;margin:10px;padding:5px;border:1px solid #bfbfbf;resize:vertical;outline:none;}
 .send p{margin:10px;}
 .list{float:right;}
 .list{float:right;margin:10px;}
 .list h3{font-size:14px;margin:0;}
 .list .online{font-size:12px;padding-left:6px;font-weight: normal;}
-.list ul{width:200px;list-style:none;margin:10px 0;padding:0;height: 130px;overflow: auto;}
+.list ul{width:200px;list-style:none;margin:10px 0;padding:0;height:130px;overflow: auto;}
 .list ul li{padding:3px 0;font-size:12px; cursor:pointer;}
