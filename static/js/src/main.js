@@ -18,7 +18,8 @@ define(function(require, exports, module){
 
   // 收到server的连接确认
   socket.on('open', function(){
-    var userinfo = util.getCookie('chat_user');
+    var userinfo = decodeURIComponent(util.getCookie('chat_user'));
+    userinfo = userinfo && JSON.parse(userinfo);
     if(userinfo.username){
       socket.send(util.JSONstringify({ type: 'login',  username: userinfo.username }));
     }
@@ -33,7 +34,7 @@ define(function(require, exports, module){
     $('.chatBox').show();
 
     systemTip('login', data);
-    util.setCookit('chat_user', encodeURIComponent(JSON.stringify(data)), 7);
+    util.setCookie('chat_user', encodeURIComponent(JSON.stringify(data)), 7);
 
     // 登陆后才可以发言
     socket.on('speak', function(data){
