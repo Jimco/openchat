@@ -22,7 +22,9 @@ body{background:#fff;}
 .submit{cursor:pointer;}
 .content{margin:50px auto;width:700px;border:1px solid #BFBFBF;background:#FFF;}
 .message{border-bottom:1px solid #BFBFBF;padding:10px;height: 400px;overflow:auto;line-height:1.8;}
-.message .msg{color:#FF0000;}
+.message .info-error{color:#f00;}
+.message .info-tip{color:#999;}
+.message .info-warn{color:#ff0;}
 .message .chatinfo{color:#333;}
 .message .chatinfo .name{font-size:12px;color:#12c;font-weight:bold;}
 .message .chatinfo.admin_chat .name{color:#FF0000;}
@@ -32,7 +34,7 @@ body{background:#fff;}
 .send{float:left;}
 .send .userinfo{margin:10px;}
 .send .nickinput{width:200px;height:15px;padding:5px;border:1px solid #bfbfbf;}
-.send .chatBox{display:block;width:440px;height:140px;margin:10px;padding:5px;border:1px solid #bfbfbf;resize:vertical;outline:none;}
+.send .chatArea{display:block;width:440px;height:140px;margin:10px;padding:5px;border:1px solid #bfbfbf;resize:vertical;outline:none;}
 .send p{margin:10px;}
 .list{float:right;}
 .list{float:right;margin:10px;}

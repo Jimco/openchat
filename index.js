@@ -3,70 +3,70 @@ var express = require('express')
   , path = require('path')
   , app = express()
   , server = require('http').createServer(app)
-  , io = require('socket.io').listen(server);
+  , io = require('socket.io').listen(server)
+  , util = require('./server/util')
+  , userid = 0;
 
 //设置日志级别
-io.set('log level', 1); 
+io.set('log level', 1);
 
 //WebSocket连接监听
 io.on('connection', function (socket) {
-  socket.emit('open');//通知客户端已连接
+  
+  socket.emit('open'); 
 
-  // 打印握手信息
   // console.log(socket.handshake);
 
   // 构造客户端对象
-  var client = {
-    socket: socket,
-    name: false,
-    color: getColor()
-  }
+  var clientinfo = { clientid: socket.id, userid: userid++, colortag: util.randomColor() };
 
   // 对message事件的监听
-  socket.on('message', function(msg){
-    var obj = { time: getTime(), color: client.color };
+  socket.on('message', function(data){
+    console.log(data);
+    try{
+      data = JSON.parse(data);
+    }
+    catch(error){
+      console.log('Error: ' + error);
+    }
 
-    // 判断是不是第一次连接，以第一条消息作为用户名
-    if(!client.name){
-        client.name = msg;
-        obj['text'] = client.name;
-        obj['author'] = 'System';
-        obj['type'] = 'welcome';
-        console.log(client.name + ' login');
+    data = util.mix(clientinfo, data);
+    data.time = util.getTime();
 
-        //返回欢迎语
-        socket.emit('system',obj);
-        //广播新用户已登陆
-        socket.broadcast.emit('system',obj);
-     }
-     else{
-        //如果不是第一次的连接，正常的聊天消息
-        obj['text'] = msg;
-        obj['author'] = client.name;      
-        obj['type'] = 'message';
-        console.log(client.name + ' say: ' + msg);
+    console.log(data.type);
+    switch(data.type){
+      case 'login':
+        if(data.username){
+          socket.emit(data.type, data);
+          socket.broadcast.emit('system', data);
+        }
+        else{
+          socket.emit('system', { type: data.type, msg: '用户名不能为空'});
+        }
+      break;
 
-        // 返回消息（可以省略）
-        socket.emit('message',obj);
-        // 广播向其他用户发消息
-        socket.broadcast.emit('message',obj);
-      }
-    });
+      case 'speak':
+        if(data.content){
+          socket.emit(data.type, data);
+          socket.broadcast.emit(data.type, data);
+        }
+        else{
+          socket.emit('system', {type: data.type, msg: '内容不能为空'});
+        }
+      break;
+    }
 
-    //监听出退事件
-    socket.on('disconnect', function () {  
-      var obj = {
-        time: getTime(),
-        color: client.color,
-        author: 'System',
-        text: client.name,
-        type: 'disconnect'
-      };
+  });
 
-      // 广播用户已退出
-      socket.broadcast.emit('system', obj);
-      console.log(client.name + 'Disconnect');
-    });
+  //监听出退事件
+  socket.on('disconnect', function(){
+    if(!clientinfo.username) return;
+    clientinfo.type = 'logout';
+    clientinfo.time = util.getTime();
+    // 广播用户已退出
+    socket.broadcast.emit('system', clientinfo);
+    console.log(clientinfo.username + ' Disconnect');
+  });
 
 });
 
@@ -92,16 +92,5 @@ app.get('/', function(req, res){
 });
 
 server.listen(app.get('port'), function(){
-  console.log("Express server listening on port " + app.get('port'));
+  console.log('Express server listening on port ' + app.get('port'));
 });
-
-var getTime=function(){
-  var date = new Date();
-  return date.getHours()+":"+date.getMinutes()+":"+date.getSeconds();
-}
-
-var getColor = function(){
-  var colors = ['aliceblue','antiquewhite','aqua','aquamarine','pink','red','green',
-                'orange','blue','blueviolet','brown','burlywood','cadetblue'];
-  return colors[ Math.round(Math.random() * 10000 % colors.length) ];
-}
