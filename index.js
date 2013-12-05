@@ -1,6 +1,7 @@
 //引入程序包
 var express = require('express')
   , path = require('path')
+  , app = express()
   , server = require('http').createServer(app)
   , io = require('socket.io').listen(server)
   , util = require('./server/util')
@@ -25,7 +26,7 @@ io.on('connection', function (socket) {
       socket.broadcast.emit('say', data); // 向其他所有用户广播消息
     }
     else{
-      var clients = io.sockets.clients; // 向特定用户广播消息，clients 为存储所有连接对象的数组
+      var clients = io.sockets.clients(); // 向特定用户广播消息，clients 为存储所有连接对象的数组
 
       clients.forEach(function(client){
         if(client.name === data.to){
@@ -64,20 +65,20 @@ app.configure('development', function(){
 
 app.get('/', function(req, res){
   if (req.cookies.chat_user == null) {
-    res.redirect('/signin');
+    res.redirect('/login');
   } else {
     res.sendfile('views/chat.html');
   }
 });
 
-app.get('login', function(req, res){
+app.get('/login', function(req, res){
   res.sendfile('views/login.html');
 });
 
-app.post('login', function(req, res){
+app.post('/login', function(req, res){
   if(users[req.body.name]){
     //存在，则不允许登陆
-    res.redirect('/signin');
+    res.redirect('/login');
   } 
   else{
     //不存在，把用户名存入 cookie 并跳转到主页
