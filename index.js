@@ -1,73 +1,48 @@
 //引入程序包
 var express = require('express')
   , path = require('path')
-  , app = express()
   , server = require('http').createServer(app)
   , io = require('socket.io').listen(server)
   , util = require('./server/util')
-  , userid = 0;
+  , users = {};
 
 //设置日志级别
 io.set('log level', 1);
 
-//WebSocket连接监听
 io.on('connection', function (socket) {
   
-  socket.emit('open'); 
+  // 监听上线
+  socket.on('online', function(data){
+    socket.name = data.user;
+    if(!users[data.user]) users[data.user] = data.user;
 
-  // console.log(socket.handshake);
-
-  // 构造客户端对象
-  var clientinfo = { clientid: socket.id, userid: userid++, colortag: util.randomColor() };
-
-  // 对message事件的监听
-  socket.on('message', function(data){
-    console.log(data);
-    try{
-      data = JSON.parse(data);
-    }
-    catch(error){
-      console.log('Error: ' + error);
-    }
-
-    data = util.mix(clientinfo, data);
-    data.time = util.getTime();
-
-    console.log(data.type);
-    switch(data.type){
-      case 'login':
-        if(data.username){
-          socket.emit(data.type, data);
-          socket.broadcast.emit('system', data);
-        }
-        else{
-          socket.emit('system', { type: data.type, msg: '用户名不能为空'});
-        }
-      break;
-
-      case 'speak':
-        if(data.content){
-          socket.emit(data.type, data);
-          socket.broadcast.emit(data.type, data);
-        }
-        else{
-          socket.emit('system', {type: data.type, msg: '内容不能为空'});
-        }
-      break;
-    }
-
+    io.sockets.emit('online', {users: users, user: data.user}); // 向所有用户广播消息
   });
 
-  //监听出退事件
-  socket.on('disconnect', function(){
-    if(!clientinfo.username) return;
-    clientinfo.type = 'logout';
-    clientinfo.time = util.getTime();
-    // 广播用户已退出
-    socket.broadcast.emit('system', clientinfo);
-    console.log(clientinfo.username + ' Disconnect');
+  // 监听发言
+  socket.on('say', function(data){
+    if(data.to === 'all'){
+      socket.broadcast.emit('say', data); // 向其他所有用户广播消息
+    }
+    else{
+      var clients = io.sockets.clients; // 向特定用户广播消息，clients 为存储所有连接对象的数组
+
+      clients.forEach(function(client){
+        if(client.name === data.to){
+          client.emit('say', data);
+        }
+      });
+    }
   });
 
+  // 监听下线
+  socket.on('disconnect', function(data){
+    if(users[socket.name]){
+      delete users[socket.name];
+      socket.broadcast.emit('offline', {users: users, user: socket.name});
+    }
+  });
+  
 });
 
 //express基本配置
@@ -77,6 +52,7 @@ app.configure(function(){
   app.use(express.favicon());
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
+  app.use(express.cookieParser());
   app.use(express.methodOverride());
   app.use(app.router);
   app.use(express.static(path.join(__dirname, 'static')));
@@ -86,10 +62,30 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
-// 指定webscoket的客户端的html文件
 app.get('/', function(req, res){
-  res.sendfile('views/chat.html');
+  if (req.cookies.chat_user == null) {
+    res.redirect('/signin');
+  } else {
+    res.sendfile('views/chat.html');
+  }
 });
+
+app.get('login', function(req, res){
+  res.sendfile('views/login.html');
+});
+
+app.post('login', function(req, res){
+  if(users[req.body.name]){
+    //存在，则不允许登陆
+    res.redirect('/signin');
+  } 
+  else{
+    //不存在，把用户名存入 cookie 并跳转到主页
+    res.cookie('chat_user', req.body.name, {maxAge: 1000*60*60*24*30});
+    res.redirect('/');
+  }
+});
+
 
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
