@@ -21,7 +21,7 @@ body{background:#fff;}
 /* Main */
 .submit{cursor:pointer;}
 .content{margin:50px auto;width:700px;border:1px solid #BFBFBF;background:#FFF;}
-.message{border-bottom:1px solid #BFBFBF;padding:10px;height: 400px;overflow:auto;line-height:1.8;}
+.message{border-bottom:1px solid #BFBFBF;padding:10px;height:400px;overflow:auto;line-height:1.8;font-size:14px;}
 .message .info-error{color:#f00;}
 .message .info-tip{color:#999;}
 .message .info-warn{color:#ff0;}
