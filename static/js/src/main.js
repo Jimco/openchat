@@ -69,15 +69,23 @@ define(function(require, exports, module){
   // 刷新用户在线列表
   function flushUsers(users) {
     var $list = $('.list')
-      , count = 0;
-    //清空之前用户列表，添加 "所有人" 选项并默认为灰色选中效果
-    $list.find('ul').html('<li title="双击聊天" alt="all" class="sayingto" onselectstart="return false">所有人</li>');
-    //遍历生成用户在线列表
+      , listhtml = []
+      , count = 0
+      , curStyle;
+
+    listhtml.push('<li title="双击聊天" alt="all" class="sayingto" onselectstart="return false">所有人</li>');
+
     for (var i in users) {
-      $list.find('ul').append('<li alt="' + users[i] + '" title="双击聊天" onselectstart="return false">' + users[i] + '</li>');
+      // $list.find('ul').append();
+      curStyle = users[i] === from ? ' style="color:#f00;"' : '';
+      listhtml.push('<li alt="' + users[i] + '" title="双击聊天" onselectstart="return false"'+ curStyle +'>' + users[i] + '</li>')
       count++;
     }
-    $list.find('.online').text(count);
+
+    $list
+      .find('.online').text(count).end()
+      .find('ul').html(listhtml.join(''));
+
     //双击对某人聊天
     $list.on('dblclick', 'li', function() {
       //如果不是双击的自己的名字
