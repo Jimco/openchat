@@ -86,18 +86,14 @@ define(function(require, exports, module){
       .find('.online').text(count).end()
       .find('ul').html(listhtml.join(''));
 
-    //双击对某人聊天
+    // 双击对某人聊天
     $list.on('dblclick', 'li', function() {
-      //如果不是双击的自己的名字
       if ($(this).attr('alt') != from) {
-        //设置被双击的用户为说话对象
         to = $(this).attr('alt');
-        //清除之前的选中效果
-        $(".list ul > li").removeClass('sayingto');
-        //给被双击的用户添加选中效果
+        $(".list ul > li").removeClass('sayingto'); // 清除之前的选中效果
         $(this).addClass('sayingto');
-        //刷新正在对谁说话
-        showSayTo();
+
+        showSayTo(); // 刷新正在对谁说话
       }
     });
   }
