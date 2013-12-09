@@ -1,6 +1,6 @@
 seajs.config({
   alias: {
-    'main': location.search.indexOf('debug') > -1 ? 'src/main' : 'src/main'
+    'main': location.search.indexOf('debug') > -1 ? 'src/main' : 'dist/main'
   }
 });
 

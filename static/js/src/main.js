@@ -6,7 +6,7 @@
 define(function(require, exports, module){
   var util = require('./util')
     , placeholderPlugin = require('./jquery_placeholder')
-    , socket = require('/socket.io/socket.io')
+    // , socket = require('http://localhost:3000/socket.io/socket.io')
     , $msgBox = $('.message')
     , $chatBox = $('.chatArea')
     , from = util.getCookie('chat_user')
