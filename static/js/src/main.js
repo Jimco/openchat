@@ -9,7 +9,7 @@ define(function(require, exports, module){
     // , socket = require('http://localhost:3000/socket.io/socket.io')
     , $msgBox = $('.message')
     , $chatBox = $('.chatArea')
-    , from = util.getCookie('chat_user')
+    , from = decodeURIComponent(util.getCookie('chat_user'))
     , to = 'all';
 
   socket = io.connect();
